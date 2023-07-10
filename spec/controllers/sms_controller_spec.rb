@@ -7,6 +7,7 @@ RSpec.describe Api::SmsController, type: :controller do
                 expect {
                     post :send_message, params: { phone_number: '111-111-1111', message: 'I am a message' } 
                 }.to change(SmsMessage, :count).by(1)
+                expect(response.status).to eq 200
             end
         end
 
@@ -15,6 +16,7 @@ RSpec.describe Api::SmsController, type: :controller do
                 expect {
                     post :send_message, params: { message: 'I am a message' } 
                 }.not_to change(SmsMessage, :count)
+                expect(response.status).to eq 400
             end
         end
    end
