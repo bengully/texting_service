@@ -13,7 +13,7 @@ class SmsProvider
     private
 
     def params
-        { to_number: @phone_number, message: @message, callback_url: "#{ENV['URL']}/api/delivery_status" }
+        { to_number: @phone_number, message: @message, callback_url: "https://#{ENV['HOST']}/api/delivery_status" }
     end
 
     def provider

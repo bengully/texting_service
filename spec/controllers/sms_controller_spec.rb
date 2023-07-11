@@ -32,7 +32,7 @@ RSpec.describe Api::SmsController, type: :controller do
         let(:message_id) { sms_message.message_id }
 
         it 'updates the sms record with the corresponding message id' do
-            post :delivery_status, params: { status: 'delivered', message_id: message_id }
+            post :delivery_status, params: { sm: { status: 'delivered', message_id: message_id } }
 
             expect(response.status).to eq 200
             expect(sms_message.reload.status).to eq 'delivered'
