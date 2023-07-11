@@ -14,7 +14,7 @@ RSpec.describe SmsMessage, type: :model do
     context 'when all required params are not provided' do
         let(:params) { { message: 'Message' } }
 
-        it 'is a valid record' do
+        it 'is not a valid record' do
             expect(sms_message).not_to be_valid
         end
     end

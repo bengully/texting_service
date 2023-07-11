@@ -2,6 +2,12 @@ require 'rails_helper'
 
 RSpec.describe Api::SmsController, type: :controller do
    describe 'send_message' do 
+        let(:message_id) { SecureRandom.hex }
+
+        before do
+            stub_request(:post, ENV['PROVIDER']).to_return(status: 200, body: { message_id: message_id }.to_json)
+        end
+
         context 'when all valid params are provided' do
             it 'creates an sms message record' do
                 expect {
@@ -18,6 +24,18 @@ RSpec.describe Api::SmsController, type: :controller do
                 }.not_to change(SmsMessage, :count)
                 expect(response.status).to eq 400
             end
+        end
+   end
+
+   describe 'delivery_status' do
+        let(:sms_message) { create(:sms_message) }
+        let(:message_id) { sms_message.message_id }
+
+        it 'updates the sms record with the corresponding message id' do
+            post :delivery_status, params: { status: 'delivered', message_id: message_id }
+
+            expect(response.status).to eq 200
+            expect(sms_message.reload.status).to eq 'delivered'
         end
    end
 end
