@@ -11,10 +11,18 @@ RSpec.describe SmsMessage, type: :model do
         end
     end
 
-    context 'when all required params are not provided' do
+    context 'when a phone number is not provided' do
         let(:params) { { message: 'Message' } }
 
-        it 'is not a valid record' do
+        it 'is invalid' do
+            expect(sms_message).not_to be_valid
+        end
+    end
+
+    context 'when a message is not provided' do
+        let(:params) { { phone_number: '5555555555' } }
+
+        it 'is invalid' do
             expect(sms_message).not_to be_valid
         end
     end
