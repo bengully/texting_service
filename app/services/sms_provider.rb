@@ -7,7 +7,7 @@ class SmsProvider
         @phone_number = phone_number
         @message = message
 
-        return Faraday.post(provider, params)
+        return Faraday.post(provider, params.to_json)
     end
 
     private
