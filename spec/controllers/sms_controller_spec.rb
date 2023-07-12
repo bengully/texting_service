@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Api::SmsController, type: :controller do
+   before do
+    allow(LoadBalancer).to receive(:check_load).and_return(ENV['PROVIDER']) 
+   end
+
    describe 'send_message' do 
         let(:message_id) { SecureRandom.hex }
 
@@ -41,16 +45,35 @@ RSpec.describe Api::SmsController, type: :controller do
             end
         end
 
-        context 'when the sms provider response is not successful' do 
+        context 'when the sms provider response is not successful' do
             before do
                 stub_request(:post, ENV['PROVIDER']).to_return(status: 500, body: { error: 'There was an error' }.to_json)
             end
 
-            it 'does not successfully create an sms message record' do
-                expect {
-                    post :send_message, params: { phone_number: '111-111-1111', message: 'I am a message' } 
-                }.not_to change(SmsMessage, :count)
-                expect(response.status).to eq 500
+            context 'and the backup provider is also unsuccessful' do
+                before do
+                    stub_request(:post, ENV['PROVIDER_BACKUP']).to_return(status: 500, body: { error: 'There was an error' }.to_json)
+                end
+
+                it 'does not successfully create an sms message record' do
+                    expect {
+                        post :send_message, params: { phone_number: '111-111-1111', message: 'I am a message' } 
+                    }.not_to change(SmsMessage, :count)
+                    expect(response.status).to eq 500
+                end
+            end
+
+            context 'and the backup provider is successful' do
+                before do
+                    stub_request(:post, ENV['PROVIDER_BACKUP']).to_return(status: 200, body: { message_id: message_id }.to_json)
+                end
+
+                it 'creates an sms message record' do
+                    expect {
+                        post :send_message, params: { phone_number: '111-111-1111', message: 'I am a message' }
+                    }.to change(SmsMessage, :count).by(1)
+                    expect(response.status).to eq 200
+                end
             end
         end
    end

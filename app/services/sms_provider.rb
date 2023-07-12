@@ -7,7 +7,7 @@ class SmsProvider
         @phone_number = phone_number
         @message = message
 
-        return Faraday.post(provider, params.to_json)
+        return sms_provider_call
     end
 
     private
@@ -22,5 +22,17 @@ class SmsProvider
 
     def provider_backup
         ENV['PROVIDER_BACKUP']
+    end
+
+    def sms_provider_call
+        url = LoadBalancer.check_load(light_load: provider, heavy_load: provider_backup)
+        response = Faraday.post(url, params.to_json)
+        
+        if response.status == 500
+            backup_url = ([provider, provider_backup] - [url]).first
+            return Faraday.post(backup_url, params.to_json)
+        else
+            return response
+        end
     end
 end
