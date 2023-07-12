@@ -5,6 +5,55 @@ RSpec.describe Api::SmsController, type: :controller do
     allow(LoadBalancer).to receive(:check_load).and_return(ENV['PROVIDER']) 
    end
 
+   describe 'index' do
+        let!(:sms_messages) { create_list(:sms_message, 3) }
+        let!(:sms_message_alt) { create(:sms_message_alt) }
+
+        context 'when no params are included' do
+            it 'returns the sms_messages' do
+                get :index, params: {}
+
+                response_ids = JSON.parse(response.body).map {|message| message['id'] }
+                expect(response_ids).to match_array(sms_messages.pluck(:id) << sms_message_alt.id)
+            end
+        end
+
+        context 'when a phone number is included in the params' do
+            it 'returns the sms_messages only for the provided phone number' do
+                get :index, params: { phone_number: sms_messages.first.phone_number }
+
+                response_ids = JSON.parse(response.body).map {|message| message['id'] }
+                expect(response_ids).to match_array(sms_messages.pluck(:id))
+            end
+        end
+
+        context 'when a page number is specified in the params' do
+            let!(:sms_messages) { create_list(:sms_message, 20) }
+            context 'and no phone number is provided' do
+                it 'returns 10 message records from the specified page' do
+                    get :index, params: { page: 2 }
+
+                    response_ids = JSON.parse(response.body).map {|message| message['id'] }
+                    sms_messages_to_match = (sms_messages << sms_message_alt).sort_by { |message| message['created_at'] }
+
+                    expect(response_ids).to match_array(sms_messages_to_match[10,10].pluck(:id))
+                end
+            end
+
+            context 'and a phone number is provided' do
+                it 'returns 10 message records from the specified page filtered by phone number' do
+                    get :index, params: { page: 2, phone_number: sms_messages.first.phone_number }
+
+                    response_ids = JSON.parse(response.body).map {|message| message['id'] }
+
+                    expect(response_ids).to match_array(sms_messages.sort_by(&:created_at)[10,10].pluck(:id))
+                end
+            end
+        end
+
+
+   end
+
    describe 'send_message' do 
         let(:message_id) { SecureRandom.hex }
 

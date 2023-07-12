@@ -1,6 +1,12 @@
 class Api::SmsController < ApplicationController
     skip_before_action :verify_authenticity_token
 
+    def index
+        sms_messages = sms_params[:phone_number].nil? ? SmsMessage.all : SmsMessage.where(phone_number: sms_params[:phone_number])
+        sms_messages = sms_messages.order(:created_at).limit(10).offset(page)
+        render json: sms_messages
+    end
+
     def send_message
         sms_response = SmsProvider.call(phone_number: sms_params[:phone_number], message: sms_params[:message])
         sms_message = SmsMessage.new(phone_number: sms_params[:phone_number], message: sms_params[:message])
@@ -31,10 +37,21 @@ class Api::SmsController < ApplicationController
     private
 
     def sms_params
-        params.permit(:phone_number, :message)
+        params.permit(:phone_number, :message, :page)
     end
 
     def delivery_params
         params.require(:sm).permit(:status, :message_id)
+    end
+
+    def page
+        page = sms_params[:page].to_i
+
+        if page <= 1
+            return 0
+        else
+            return (page - 1) * 10
+        end
+
     end
 end
