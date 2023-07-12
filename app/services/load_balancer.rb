@@ -1,6 +1,6 @@
 class LoadBalancer
     class << self
-        def reset
+        def reset_providers
             $redis.set('provider1', 0)
             $redis.set('provider2', 0)
         end

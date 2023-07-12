@@ -129,6 +129,8 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.2)
     minitest (5.18.1)
+    mock_redis (0.36.0)
+      ruby2_keywords
     msgpack (1.7.1)
     net-imap (0.3.6)
       date
@@ -246,6 +248,7 @@ DEPENDENCIES
   faraday
   jbuilder
   jsbundling-rails
+  mock_redis
   pg (~> 1.1)
   puma (~> 5.0)
   rails (~> 7.0.6)
