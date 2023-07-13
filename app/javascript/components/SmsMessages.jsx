@@ -4,6 +4,8 @@ const SmsMessages = () => {
     const [messages, setMessages] = useState([]);
     const [nextPage, setNextPage] = useState(2);
     const [previousPage, setPreviousPage] = useState(0);
+    const [page, setPage] = useState(0);
+    const [phoneNumber, setPhoneNumber] = useState();
 
     useEffect(() => {
         const url = "/api/messages";
@@ -19,7 +21,13 @@ const SmsMessages = () => {
 
 
     const getNextPage = () => {
-        const url = "/api/messages?" + new URLSearchParams({page: nextPage});
+        let params = { page: nextPage };
+
+        if (phoneNumber){
+            params.phone_number = phoneNumber;
+        }
+
+        const url = "/api/messages?" + new URLSearchParams(params);
         fetch(url).then((res) => {
             if (res.ok) {
                 return res.json();
@@ -28,12 +36,19 @@ const SmsMessages = () => {
         }).then((res) => {
             setMessages(res);
         });
+        setPage(nextPage);
         setNextPage(nextPage+1)
         setPreviousPage(previousPage+1)
     }
 
     const getPreviousPage = () => {
-        const url = "/api/messages?" + new URLSearchParams({page: previousPage});
+        let params = { page: previousPage };
+
+        if (phoneNumber){
+            params.phone_number = phoneNumber;
+        }
+
+        const url = "/api/messages?" + new URLSearchParams(params);
         fetch(url).then((res) => {
             if (res.ok) {
                 return res.json();
@@ -45,9 +60,26 @@ const SmsMessages = () => {
         if ((previousPage - 1 < 0)) {
             setNextPage(0)
         } else {
-            setNextPage(previousPage-1)
+            setPage(previousPage)
+            setPreviousPage(previousPage-1)
             setNextPage(nextPage-1)
         }
+    }
+
+    const searchPhoneNumber = () => {
+        const inputData = document.getElementById('phone-search-input').value
+
+        const url = "/api/messages?" + new URLSearchParams({phone_number: inputData, page: page});
+        fetch(url).then((res) => {
+            if (res.ok) {
+                return res.json();
+            }
+            throw new Error("The request was unsuccessful.");
+        }).then((res) => {
+            setMessages(res);
+        });
+
+        setPhoneNumber(inputData);
     }
 
     const smsMessages = messages.map((message, index) => (
@@ -56,6 +88,7 @@ const SmsMessages = () => {
             <td>{new Date(message.created_at).toLocaleTimeString()}</td>
             <td>{message.phone_number}</td>
             <td>{message.message}</td>
+            <td>{message.status}</td>
         </tr>
      ));
 
@@ -68,6 +101,7 @@ const SmsMessages = () => {
                     <th>Time</th>
                     <th>Phone Number</th>
                     <th>Message</th>
+                    <th>Status</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -76,6 +110,8 @@ const SmsMessages = () => {
             </table>
             <button onClick={getPreviousPage}>Previous</button>
             <button onClick={getNextPage}>Next</button>
+            <br/>
+            <input id="phone-search-input"></input><button onClick={searchPhoneNumber}>Search</button>
         </>
     )
 }
