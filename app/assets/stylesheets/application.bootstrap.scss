@@ -1,2 +1,55 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+
+body {
+    background-color: grey;
+}
+
+.sms-table {
+    background: rgb(35,203,95);
+    background: linear-gradient(90deg, rgba(35,203,95,1) 0%, rgba(0,212,255,1) 100%);
+    box-shadow: -40px 50px 70px #505050;
+    margin: auto;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    width: 80%;
+}
+
+.sms-table td {
+    background-color: rgba(142, 255, 179, 0.3);
+    border-collapse: separate;
+    border-spacing: 0 5px;
+    color: rgb(237, 237, 237);
+    font-size: large;
+    padding: 5px;
+    text-align: center;
+}
+
+.sms-table th {
+    color: rgb(237, 237, 237);
+    text-align: center;
+}
+
+.table-controls {
+    text-align: center;
+}
+
+.table-controls .btn {
+    background: none;
+    border: none;
+    color: rgb(237, 237, 237);
+    margin: 10px;
+}
+
+.table-controls .search {
+    background: none;
+    color: rgb(237, 237, 237);
+    margin: 10px;
+}
+
+.title {
+    color: rgb(237, 237, 237);
+    font-size: x-large;
+    text-align: center;
+}

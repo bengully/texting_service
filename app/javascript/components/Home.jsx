@@ -4,7 +4,7 @@ import SmsMessages from "./SmsMessages";
 
 export default () => (
   <div>
-    SMS Messages
+    <div className="title">SMS Messages</div>
     <SmsMessages/>
   </div>
 );

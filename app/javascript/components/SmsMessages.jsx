@@ -94,7 +94,7 @@ const SmsMessages = () => {
 
     return(
         <>
-            <table>
+            <table className="sms-table">
                 <thead>
                 <tr>
                     <th>Date</th>
@@ -108,10 +108,14 @@ const SmsMessages = () => {
                     {smsMessages}
                 </tbody>
             </table>
-            <button onClick={getPreviousPage}>Previous</button>
-            <button onClick={getNextPage}>Next</button>
-            <br/>
-            <input id="phone-search-input"></input><button onClick={searchPhoneNumber}>Search</button>
+            <div className="table-controls">
+                <button className="btn" onClick={getPreviousPage}>Previous</button>
+                <span>
+                    <input className="search" id="phone-search-input"></input>
+                    <button className="search" onClick={searchPhoneNumber}>Search</button>
+                </span>
+                <button className="btn" onClick={getNextPage}>Next</button>
+            </div>
         </>
     )
 }
