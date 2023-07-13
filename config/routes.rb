@@ -9,4 +9,6 @@ Rails.application.routes.draw do
     post :send_message, to: 'sms#send_message'
     post :delivery_status, to: 'sms#delivery_status'
   end
+
+  root 'home#index'
 end
