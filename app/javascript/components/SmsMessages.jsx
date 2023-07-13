@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 
 const SmsMessages = () => {
     const [messages, setMessages] = useState([]);
+    const [nextPage, setNextPage] = useState(2);
+    const [previousPage, setPreviousPage] = useState(0);
 
     useEffect(() => {
         const url = "/api/messages";
-        fetch(url).then((res) =>{
+        fetch(url).then((res) => {
             if (res.ok) {
                 return res.json();
             }
@@ -15,6 +17,38 @@ const SmsMessages = () => {
         });
     }, []);
 
+
+    const getNextPage = () => {
+        const url = "/api/messages?" + new URLSearchParams({page: nextPage});
+        fetch(url).then((res) => {
+            if (res.ok) {
+                return res.json();
+            }
+            throw new Error("The request was unsuccessful.");
+        }).then((res) => {
+            setMessages(res);
+        });
+        setNextPage(nextPage+1)
+        setPreviousPage(previousPage+1)
+    }
+
+    const getPreviousPage = () => {
+        const url = "/api/messages?" + new URLSearchParams({page: previousPage});
+        fetch(url).then((res) => {
+            if (res.ok) {
+                return res.json();
+            }
+            throw new Error("The request was unsuccessful.");
+        }).then((res) => {
+            setMessages(res);
+        });
+        if ((previousPage - 1 < 0)) {
+            setNextPage(0)
+        } else {
+            setNextPage(previousPage-1)
+            setNextPage(nextPage-1)
+        }
+    }
 
     const smsMessages = messages.map((message, index) => (
         <tr key={index}>
@@ -40,6 +74,8 @@ const SmsMessages = () => {
                     {smsMessages}
                 </tbody>
             </table>
+            <button onClick={getPreviousPage}>Previous</button>
+            <button onClick={getNextPage}>Next</button>
         </>
     )
 }
